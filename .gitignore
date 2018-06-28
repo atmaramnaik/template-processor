@@ -2,5 +2,4 @@
 .idea/
 build.gradle
 out/
-src/
 template-processor.iml
