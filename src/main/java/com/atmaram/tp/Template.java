@@ -29,6 +29,7 @@ public class Template {
     public static Template parse(String template,TemplateType templateType) throws TemplateParseException {
         JSONParser jsonParser=new JSONParser();
         template= JSONTemplateParsingUtil.replaceVariablesWithQuotedVariables(template);
+//        template=JSONTemplateParsingUtil.replaceStaticArraysWithStaticVariables(template);
         template= JSONTemplateParsingUtil.replaceLoopsWithTransformedJSON(template);
         if(templateType==TemplateType.JSON){
             try {
@@ -62,14 +63,14 @@ public class Template {
 //                            String newVarName=variableName.substring(prefix.length()+1,variableName.length());
 //                            ojoObject.put(key,data.get(newVarName));
 //                        } else {
-                        ojoObject.put(key, data.get(variableName));
+                        ojoObject.put(key, getVariableValue(variableName,data));
 //                        }
                 } else {
                     ojoObject.put(key,value);
                 }
             } else if(value instanceof JSONArray){
                 String loopVariable=getLoopVariable((JSONObject)( (JSONArray)value).get(0));
-                List<Object> dataArray=(List<Object>)data.get(loopVariable);
+                List<Object> dataArray=(List<Object>)getVariableValue(loopVariable,data);
                 JSONArray outputArray=new JSONArray();
                 for(int i=0;i<dataArray.size();i++){
                     Template template=new Template((JSONObject) ((JSONObject)( (JSONArray)value).get(0)).get("template"));
@@ -99,5 +100,19 @@ public class Template {
 
     public String getLoopVariable(JSONObject object){
         return (String)object.get("variable");
+    }
+
+    public Object getVariableValue(String variableName,HashMap<String,Object> data){
+        if(variableName.startsWith("_")){
+            if(variableName.equals("_ones()")){
+                List<Integer> lst=new ArrayList<>();
+                lst.add(new Integer(0));
+                return lst;
+            } else if(variableName.equals("_this")){
+                return data;
+            }
+            return null;
+        }
+        return data.get(variableName);
     }
 }
