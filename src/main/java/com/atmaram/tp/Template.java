@@ -34,7 +34,8 @@ public class Template {
         if(templateType==TemplateType.JSON){
             try {
                 JSONObject jsonTemplate=(JSONObject) jsonParser.parse(template);
-                return new Template(jsonTemplate);
+                JSONObject transformed_object=transform(jsonTemplate);
+                return new Template(transformed_object);
             } catch (ParseException ex){
                 throw new TemplateParseException();
             }
@@ -59,21 +60,16 @@ public class Template {
             if(value instanceof String){
                 if(((String)value).startsWith("${") && ((String)value).endsWith("}")){
                     String variableName=((String)value).substring(2,((String)value).length()-1);
-//                        if(variableName.startsWith(prefix+".")){
-//                            String newVarName=variableName.substring(prefix.length()+1,variableName.length());
-//                            ojoObject.put(key,data.get(newVarName));
-//                        } else {
                         ojoObject.put(key, getVariableValue(variableName,data));
-//                        }
                 } else {
                     ojoObject.put(key,value);
                 }
-            } else if(value instanceof JSONArray){
-                String loopVariable=getLoopVariable((JSONObject)( (JSONArray)value).get(0));
+            } else if(value instanceof JSONLoop){
+                String loopVariable=( (JSONLoop)value).variable;
                 List<Object> dataArray=(List<Object>)getVariableValue(loopVariable,data);
                 JSONArray outputArray=new JSONArray();
+                Template template=new Template(((JSONLoop)value).inner_object);
                 for(int i=0;i<dataArray.size();i++){
-                    Template template=new Template((JSONObject) ((JSONObject)( (JSONArray)value).get(0)).get("template"));
                     Object dataObject=dataArray.get(i);
                     JSONObject outputObject;
                     if(dataObject instanceof HashMap){
@@ -84,14 +80,38 @@ public class Template {
                         outputObject=template.fillJSON(innerData);
                     }
                     Template newTemplate=new Template(outputObject);
-                    outputObject=newTemplate.fillJSON(data);
-                    outputArray.add(outputObject);
+                    JSONObject newOutputObject=newTemplate.fillJSON(data);
+                    outputArray.add(newOutputObject);
                 }
                 ojoObject.put(key,outputArray);
             }
             else if (value instanceof JSONObject){
                 Template template=new Template((JSONObject) value);
                 ojoObject.put(key,template.fillJSON(data));
+            } else if (value instanceof JSONArray){
+                JSONArray jaValue=(JSONArray)value;
+                JSONArray filled_array=new JSONArray();
+                for(int i=0;i<jaValue.size();i++){
+                    Object arrayObject=jaValue.get(i);
+                    if(arrayObject instanceof JSONObject){
+                        Template template=new Template((JSONObject) arrayObject);
+                        filled_array.add(template.fillJSON(data));
+                    } else if(arrayObject instanceof String){
+                        if(((String)arrayObject).startsWith("${") && ((String)arrayObject).endsWith("}")){
+                            String variableName=((String)arrayObject).substring(2,((String)arrayObject).length()-1);
+                            filled_array.add(getVariableValue(variableName,data));
+//                        }
+                        } else {
+                            filled_array.add(arrayObject);
+                        }
+                    } else {
+                        filled_array.add(arrayObject);
+                    }
+
+                }
+                ojoObject.put(key,filled_array);
+            } else {
+                ojoObject.put(key,value);
             }
         }
 
@@ -109,10 +129,41 @@ public class Template {
                 lst.add(new Integer(0));
                 return lst;
             } else if(variableName.equals("_this")){
-                return data;
+                return data.get("_this");
             }
             return null;
         }
         return data.get(variableName);
+    }
+    public static JSONObject transform(JSONObject object) {
+        JSONObject ojoObject = new JSONObject();
+        for (Object key :
+                object.keySet()) {
+            Object value = object.get(key);
+            if (value instanceof JSONArray) {
+                Object inner_object=((JSONArray) value).get(0);
+                if(inner_object instanceof JSONObject){
+                    JSONObject inner_joobject_template = (JSONObject) ((JSONArray) value).get(0);
+                    if (inner_joobject_template.containsKey("variable") && inner_joobject_template.containsKey("template")) {
+                        JSONLoop loopObject = new JSONLoop();
+                        loopObject.variable = (String) inner_joobject_template.get("variable");
+                        loopObject.inner_object = transform((JSONObject) inner_joobject_template.get("template"));
+                        ojoObject.put(key, loopObject);
+                    } else {
+                        ojoObject.put(key, value);
+                    }
+
+                } else {
+                    ojoObject.put(key, value);
+                }
+
+            } else if(value instanceof JSONObject){
+                ojoObject.put(key,transform((JSONObject) value));
+            } else {
+                ojoObject.put(key,value);
+            }
+
+        }
+        return ojoObject;
     }
 }
