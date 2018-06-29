@@ -21,6 +21,11 @@ public class Template {
         this.jsonTemplate=jsonTemplate;
         this.templateType=TemplateType.JSON;
     }
+
+    private Template() {
+
+    }
+
     public enum TemplateType {
         JSON,
         XML,
@@ -42,8 +47,6 @@ public class Template {
         }
         return null;
     }
-
-
     public Object fill(HashMap<String,Object> data){
         if(this.templateType==TemplateType.JSON){
             return fillJSON(data);
@@ -117,11 +120,6 @@ public class Template {
 
         return ojoObject;
     }
-
-    public String getLoopVariable(JSONObject object){
-        return (String)object.get("variable");
-    }
-
     public Object getVariableValue(String variableName,HashMap<String,Object> data){
         if(variableName.startsWith("_")){
             if(variableName.equals("_ones()")){
@@ -165,5 +163,48 @@ public class Template {
 
         }
         return ojoObject;
+    }
+
+    private HashMap<String,Object> extract(JSONObject jsonResult,HashMap<String,Object> retData){
+
+        for (Object key:
+                jsonTemplate.keySet()) {
+            Object oValue=jsonTemplate.get(key);
+
+            if(oValue instanceof String){
+                if(isVariable((String)oValue)){
+                    String variableName=getVariableName((String)oValue);
+                    retData.put(variableName,jsonResult.get(key));
+                }
+            } else if(oValue instanceof JSONLoop){
+                JSONLoop jlValue=(JSONLoop)oValue;
+                String variableName=jlValue.variable;
+                List lst=new ArrayList();
+                JSONArray resultArray=(JSONArray)jsonResult.get(key);
+                for (Object arrayElementResult:
+                     resultArray) {
+                    if(arrayElementResult instanceof JSONObject){
+                        JSONObject arrayElementJSONResult=(JSONObject)arrayElementResult;
+                        Template template=new Template();
+                        template.templateType=TemplateType.JSON;
+                        template.jsonTemplate=jlValue.inner_object;
+                        lst.add(template.extract(arrayElementJSONResult));
+                    }
+                }
+                retData.put(variableName,lst);
+            }
+        }
+        return retData;
+    }
+    public HashMap<String,Object> extract(JSONObject jsonResult){
+        HashMap<String,Object> retData=new HashMap<>();
+        extract(jsonResult,retData);
+        return retData;
+    }
+    private boolean isVariable(String strValue){
+        return (strValue.startsWith("${") && strValue.endsWith("}"));
+    }
+    private String getVariableName(String strValue){
+        return strValue.substring(2,strValue.length()-1);
     }
 }
