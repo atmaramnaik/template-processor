@@ -1,6 +1,8 @@
 package com.atmaram.tp;
 
 import com.atmaram.tp.exceptions.TemplateParseException;
+import com.atmaram.tp.json.JSONTemplate;
+
 import java.util.HashMap;
 
 public class Processor {

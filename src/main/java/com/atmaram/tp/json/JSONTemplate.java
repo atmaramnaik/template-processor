@@ -1,4 +1,4 @@
-package com.atmaram.tp;
+package com.atmaram.tp.json;
 
 import com.atmaram.tp.exceptions.TemplateParseException;
 import com.atmaram.tp.util.JSONTemplateParsingUtil;

@@ -1,4 +1,4 @@
-package com.atmaram.tp;
+package com.atmaram.tp.text;
 
 import com.atmaram.tp.exceptions.TemplateParseException;
 

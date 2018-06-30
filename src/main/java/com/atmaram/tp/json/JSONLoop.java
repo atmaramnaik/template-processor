@@ -1,4 +1,4 @@
-package com.atmaram.tp;
+package com.atmaram.tp.json;
 
 import org.json.simple.JSONObject;
 

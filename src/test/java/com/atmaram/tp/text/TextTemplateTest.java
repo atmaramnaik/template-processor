@@ -1,6 +1,9 @@
-package com.atmaram.tp;
+package com.atmaram.tp.text;
 
 import com.atmaram.tp.exceptions.TemplateParseException;
+import com.atmaram.tp.text.TextLoop;
+import com.atmaram.tp.text.TextTemplate;
+import com.atmaram.tp.text.TextVariable;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -9,7 +12,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class TextJSONTemplateTest {
+public class TextTemplateTest {
     @Test
     public void should_parse_text_template_without_variable() throws TemplateParseException {
         TextTemplate textTemplate=TextTemplate.parse("Hello");
