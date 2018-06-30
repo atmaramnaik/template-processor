@@ -29,14 +29,4 @@ public class JSONTemplateParsingUtilTest {
         String results=JSONTemplateParsingUtil.replaceLoopsWithTransformedJSON("{\"name\":[{{#items}}{\"name\":\"${name}\",\"place\":\"India\"}{{/items}}]}");
         assertThat(results).isEqualTo("{\"name\":[{\"template\":{\"name\":\"${name}\",\"place\":\"India\"},\"variable\":\"items\"}]}");
     }
-    @Test
-    public void should_replace_static_arrays() throws TemplateParseException{
-        String results=JSONTemplateParsingUtil.replaceStaticArraysWithStaticVariables("{\"name\":[{\"name\":\"${name}\",\"place\":\"India\"}]}");
-        assertThat(results).isEqualTo("{\"name\":[{{#_ones()}}{\"name\":\"${name}\",\"place\":\"India\"}{{/_ones()}}]}");
-    }
-    @Test
-    public void should_not_replace_static_arrays() throws TemplateParseException{
-        String results=JSONTemplateParsingUtil.replaceStaticArraysWithStaticVariables("{\"name\":[{{#names}}{\"name\":\"${name}\",\"place\":\"India\"}{{/names}}]}");
-        assertThat(results).isEqualTo("{\"name\":[{{#names}}{\"name\":\"${name}\",\"place\":\"India\"}{{/names}}]}");
-    }
 }
