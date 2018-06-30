@@ -10,48 +10,31 @@ import org.json.simple.parser.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class Template {
+public class JSONTemplate {
     private JSONObject jsonTemplate;
-    private TemplateType templateType;
 
-    public Template(JSONObject jsonTemplate){
+    public JSONTemplate(JSONObject jsonTemplate){
         this.jsonTemplate=jsonTemplate;
-        this.templateType=TemplateType.JSON;
     }
 
-    private Template() {
+    private JSONTemplate() {
 
     }
-
-    public enum TemplateType {
-        JSON,
-        XML,
-        TEXT
-    }
-    public static Template parse(String template,TemplateType templateType) throws TemplateParseException {
+    public static JSONTemplate parse(String template) throws TemplateParseException {
         JSONParser jsonParser=new JSONParser();
         template= JSONTemplateParsingUtil.replaceVariablesWithQuotedVariables(template);
-//        template=JSONTemplateParsingUtil.replaceStaticArraysWithStaticVariables(template);
         template= JSONTemplateParsingUtil.replaceLoopsWithTransformedJSON(template);
-        if(templateType==TemplateType.JSON){
-            try {
-                JSONObject jsonTemplate=(JSONObject) jsonParser.parse(template);
-                JSONObject transformed_object=transform(jsonTemplate);
-                return new Template(transformed_object);
-            } catch (ParseException ex){
-                throw new TemplateParseException();
-            }
+        try {
+            JSONObject jsonTemplate=(JSONObject) jsonParser.parse(template);
+            JSONObject transformed_object=transform(jsonTemplate);
+            return new JSONTemplate(transformed_object);
+        } catch (ParseException ex){
+            throw new TemplateParseException();
         }
-        return null;
     }
-    public Object fill(HashMap<String,Object> data){
-        if(this.templateType==TemplateType.JSON){
-            return fillJSON(data);
-        }
-        return null;
+    public JSONObject fill(HashMap<String,Object> data){
+        return fillJSON(data);
     }
     private JSONObject fillJSON(HashMap<String,Object> data){
         JSONObject ojoObject=new JSONObject();
@@ -71,34 +54,34 @@ public class Template {
                 String loopVariable=( (JSONLoop)value).variable;
                 List<Object> dataArray=(List<Object>)getVariableValue(loopVariable,data);
                 JSONArray outputArray=new JSONArray();
-                Template template=new Template(((JSONLoop)value).inner_object);
+                JSONTemplate JSONTemplate =new JSONTemplate(((JSONLoop)value).inner_object);
                 for(int i=0;i<dataArray.size();i++){
                     Object dataObject=dataArray.get(i);
                     JSONObject outputObject;
                     if(dataObject instanceof HashMap){
-                        outputObject=template.fillJSON((HashMap<String,Object>)dataObject);
+                        outputObject= JSONTemplate.fillJSON((HashMap<String,Object>)dataObject);
                     } else {
                         HashMap<String,Object> innerData=new HashMap<>();
                         innerData.put("_this",dataObject);
-                        outputObject=template.fillJSON(innerData);
+                        outputObject= JSONTemplate.fillJSON(innerData);
                     }
-                    Template newTemplate=new Template(outputObject);
-                    JSONObject newOutputObject=newTemplate.fillJSON(data);
+                    JSONTemplate newJSONTemplate =new JSONTemplate(outputObject);
+                    JSONObject newOutputObject= newJSONTemplate.fillJSON(data);
                     outputArray.add(newOutputObject);
                 }
                 ojoObject.put(key,outputArray);
             }
             else if (value instanceof JSONObject){
-                Template template=new Template((JSONObject) value);
-                ojoObject.put(key,template.fillJSON(data));
+                JSONTemplate JSONTemplate =new JSONTemplate((JSONObject) value);
+                ojoObject.put(key, JSONTemplate.fillJSON(data));
             } else if (value instanceof JSONArray){
                 JSONArray jaValue=(JSONArray)value;
                 JSONArray filled_array=new JSONArray();
                 for(int i=0;i<jaValue.size();i++){
                     Object arrayObject=jaValue.get(i);
                     if(arrayObject instanceof JSONObject){
-                        Template template=new Template((JSONObject) arrayObject);
-                        filled_array.add(template.fillJSON(data));
+                        JSONTemplate JSONTemplate =new JSONTemplate((JSONObject) arrayObject);
+                        filled_array.add(JSONTemplate.fillJSON(data));
                     } else if(arrayObject instanceof String){
                         if(((String)arrayObject).startsWith("${") && ((String)arrayObject).endsWith("}")){
                             String variableName=((String)arrayObject).substring(2,((String)arrayObject).length()-1);
@@ -185,10 +168,9 @@ public class Template {
                      resultArray) {
                     if(arrayElementResult instanceof JSONObject){
                         JSONObject arrayElementJSONResult=(JSONObject)arrayElementResult;
-                        Template template=new Template();
-                        template.templateType=TemplateType.JSON;
-                        template.jsonTemplate=jlValue.inner_object;
-                        lst.add(template.extract(arrayElementJSONResult));
+                        JSONTemplate JSONTemplate =new JSONTemplate();
+                        JSONTemplate.jsonTemplate=jlValue.inner_object;
+                        lst.add(JSONTemplate.extract(arrayElementJSONResult));
                     }
                 }
                 retData.put(variableName,lst);

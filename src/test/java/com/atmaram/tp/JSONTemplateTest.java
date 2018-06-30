@@ -11,10 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-public class TemplateTest {
+public class JSONTemplateTest {
     @Test
     public void should_construct_and_fill_template_when_null_object() throws TemplateParseException {
-        JSONObject obj=(JSONObject) Template.parse("{\"name\":[[\"Atmaram\"]]}",Template.TemplateType.JSON).fill(null);
+        JSONObject obj=(JSONObject) JSONTemplate.parse("{\"name\":[[\"Atmaram\"]]}").fill(null);
         assertThat(obj.toJSONString()).isEqualTo("{\"name\":[[\"Atmaram\"]]}");
     }
     @Test
@@ -29,7 +29,7 @@ public class TemplateTest {
         names.add(lst2);
         obj.put("names",names);
 
-        JSONObject objJSON=(JSONObject) Template.parse("{\"name\":[{{#names}}{\"places\":[{{#_this}}{\"place\":[{{#_this}}{\"value\":${_this}}{{/_this}}]}{{/_this}}]}{{/names}}]}",Template.TemplateType.JSON).fill(obj);
+        JSONObject objJSON=JSONTemplate.parse("{\"name\":[{{#names}}{\"places\":[{{#_this}}{\"place\":[{{#_this}}{\"value\":${_this}}{{/_this}}]}{{/_this}}]}{{/names}}]}").fill(obj);
         assertThat(objJSON.toJSONString()).isEqualTo("{\"name\":[{\"places\":[{\"place\":[{\"value\":\"Atmaram\"},{\"value\":\"Roopa\"}]}]}]}");
     }
     @Test
@@ -46,8 +46,8 @@ public class TemplateTest {
         lst.add(lst1);
         lst.add(lst2);
         objData.put("names",lst);
-        Template template=Template.parse("{\"name\":\"Atmaram\"}",Template.TemplateType.JSON);
-        JSONObject result=(JSONObject) template.fill(objData);
+        JSONTemplate jsonTemplate =JSONTemplate.parse("{\"name\":\"Atmaram\"}");
+        JSONObject result= jsonTemplate.fill(objData);
         assertThat(result.toJSONString()).isEqualTo("{\"name\":\"Atmaram\"}");
 
     }
@@ -65,8 +65,8 @@ public class TemplateTest {
         lst.add(lst1);
         lst.add(lst2);
         objData.put("names",lst);
-        Template template=Template.parse("{\"inner_array\":[\"Hemlata\",\"Rohan\"]}",Template.TemplateType.JSON);
-        JSONObject result=(JSONObject) template.fill(objData);
+        JSONTemplate jsonTemplate =JSONTemplate.parse("{\"inner_array\":[\"Hemlata\",\"Rohan\"]}");
+        JSONObject result= jsonTemplate.fill(objData);
         assertThat(result.toJSONString()).isEqualTo("{\"inner_array\":[\"Hemlata\",\"Rohan\"]}");
 
     }
@@ -84,17 +84,17 @@ public class TemplateTest {
         lst.add(lst1);
         lst.add(lst2);
         objData.put("names",lst);
-        Template template=Template.parse("{\"name\":[{\"name\":\"Atmaram\"}]}",Template.TemplateType.JSON);
-        JSONObject result=(JSONObject) template.fill(objData);
+        JSONTemplate jsonTemplate =JSONTemplate.parse("{\"name\":[{\"name\":\"Atmaram\"}]}");
+        JSONObject result=(JSONObject) jsonTemplate.fill(objData);
         assertThat(result.toJSONString()).isEqualTo("{\"name\":[{\"name\":\"Atmaram\"}]}");
 
     }
     @Test
     public void should_fill_single_value() throws TemplateParseException {
-        Template template=Template.parse("{\"name\":${name}}",Template.TemplateType.JSON);
+        JSONTemplate jsonTemplate =JSONTemplate.parse("{\"name\":${name}}");
         HashMap<String,Object> objData=new HashMap<>();
         objData.put("name","Atmaram");
-        JSONObject op=(JSONObject) template.fill(objData);
+        JSONObject op= jsonTemplate.fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":\"Atmaram\"}");
     }
 
@@ -103,7 +103,7 @@ public class TemplateTest {
         HashMap<String,Object> objData=new HashMap<>();
         objData.put("name","Atmaram");
         objData.put("place","Pune");
-        JSONObject op=(JSONObject) Template.parse("{\"name\":${name},\"place\":${place}}", Template.TemplateType.JSON).fill(objData);
+        JSONObject op=JSONTemplate.parse("{\"name\":${name},\"place\":${place}}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":\"Atmaram\",\"place\":\"Pune\"}");
     }
 
@@ -114,7 +114,7 @@ public class TemplateTest {
         lst.add("Atmaram");
         lst.add("Roopa");
         objData.put("names",lst);
-        JSONObject op=(JSONObject) Template.parse("{\"name\":${names}}", Template.TemplateType.JSON).fill(objData);
+        JSONObject op=JSONTemplate.parse("{\"name\":${names}}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[\"Atmaram\",\"Roopa\"]}");
     }
     @Test
@@ -124,7 +124,7 @@ public class TemplateTest {
         lst.add("Atmaram");
         lst.add("Roopa");
         objData.put("names",lst);
-        JSONObject op=(JSONObject) Template.parse("{\"name\":[{{#names}}{\"name\":${_this}}{{/names}}]}", Template.TemplateType.JSON).fill(objData);
+        JSONObject op=JSONTemplate.parse("{\"name\":[{{#names}}{\"name\":${_this}}{{/names}}]}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[{\"name\":\"Atmaram\"},{\"name\":\"Roopa\"}]}");
     }
     @Test
@@ -141,14 +141,14 @@ public class TemplateTest {
         lst.add(lst1);
         lst.add(lst2);
         objData.put("names",lst);
-        JSONObject op=(JSONObject) Template.parse("{\"name\":${names}}", Template.TemplateType.JSON).fill(objData);
+        JSONObject op=JSONTemplate.parse("{\"name\":${names}}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[[\"Atmaram\",\"Roopa\"],[\"Hemlata\",\"Rohan\"]]}");
     }
     @Test
     public void should_return_same_template_if_no_variables() throws TemplateParseException {
         HashMap<String,Object> objData=new HashMap<>();
         objData.put("name","Mayur");
-        JSONObject op=(JSONObject) Template.parse("{\"name\":[\"Atmaram\"]}", Template.TemplateType.JSON).fill(objData);
+        JSONObject op=JSONTemplate.parse("{\"name\":[\"Atmaram\"]}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[\"Atmaram\"]}");
     }
     @Test
@@ -165,7 +165,7 @@ public class TemplateTest {
         lst.add(lst1);
         lst.add(lst2);
         objData.put("names",lst);
-        JSONObject op=(JSONObject) Template.parse("{\"name\":[{{#names}}{\"inner_array\":${_this}}{{/names}}]}", Template.TemplateType.JSON).fill(objData);
+        JSONObject op=JSONTemplate.parse("{\"name\":[{{#names}}{\"inner_array\":${_this}}{{/names}}]}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[{\"inner_array\":[\"Atmaram\",\"Roopa\"]},{\"inner_array\":[\"Hemlata\",\"Rohan\"]}]}");
     }
     @Test
@@ -181,7 +181,7 @@ public class TemplateTest {
         objArray.add(obj1);
         objArray.add(obj2);
         objData.put("items",objArray);
-        JSONObject op=(JSONObject) Template.parse("{\"name\":[{{#items}}{\"name\":${name},\"place\":${place}}{{/items}}]}", Template.TemplateType.JSON).fill(objData);
+        JSONObject op=JSONTemplate.parse("{\"name\":[{{#items}}{\"name\":${name},\"place\":${place}}{{/items}}]}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[{\"name\":\"Atmaram\",\"place\":\"Mumbai\"},{\"name\":\"Roopa\",\"place\":\"Pune\"}]}");
     }
 
@@ -190,18 +190,18 @@ public class TemplateTest {
     @Test
     public void should_extract_single_variable() throws TemplateParseException, ParseException {
         JSONParser parser=new JSONParser();
-        Template template=Template.parse("{\"name\":${name}}",Template.TemplateType.JSON);
+        JSONTemplate jsonTemplate =JSONTemplate.parse("{\"name\":${name}}");
         JSONObject objResult=(JSONObject) parser.parse("{\"name\":\"Atmaram\"}");
-        HashMap<String,Object> objData=template.extract(objResult);
+        HashMap<String,Object> objData= jsonTemplate.extract(objResult);
         assertThat(objData.containsKey("name")).isTrue();
         assertThat(objData.get("name")).isEqualTo("Atmaram");
     }
     @Test
     public void should_extract_single_variable_in_loop() throws TemplateParseException, ParseException {
         JSONParser parser=new JSONParser();
-        Template template=Template.parse("{\"names\":[{{#names}}{\"name\":${name}}{{/names}}]}",Template.TemplateType.JSON);
+        JSONTemplate jsonTemplate =JSONTemplate.parse("{\"names\":[{{#names}}{\"name\":${name}}{{/names}}]}");
         JSONObject objResult=(JSONObject) parser.parse("{\"names\":[{\"name\":\"Atmaram\"},{\"name\":\"Roopa\"}]}");
-        HashMap<String,Object> objData=template.extract(objResult);
+        HashMap<String,Object> objData= jsonTemplate.extract(objResult);
         assertThat(objData.containsKey("names")).isTrue();
         assertThat(objData.get("names")).isInstanceOf(ArrayList.class);
         assertThat(((ArrayList<HashMap<String,Object>>)objData.get("names")).size()).isEqualTo(2);
@@ -215,9 +215,9 @@ public class TemplateTest {
     @Test
     public void should_extract_multiple_variable_in_loop() throws TemplateParseException, ParseException {
         JSONParser parser=new JSONParser();
-        Template template=Template.parse("{\"names\":[{{#names}}{\"name\":${name},\"place\":${place}}{{/names}}]}",Template.TemplateType.JSON);
+        JSONTemplate jsonTemplate =JSONTemplate.parse("{\"names\":[{{#names}}{\"name\":${name},\"place\":${place}}{{/names}}]}");
         JSONObject objResult=(JSONObject) parser.parse("{\"names\":[{\"name\":\"Atmaram\",\"place\":\"Pune\"},{\"name\":\"Roopa\",\"place\":\"Mumbai\"}]}");
-        HashMap<String,Object> objData=template.extract(objResult);
+        HashMap<String,Object> objData= jsonTemplate.extract(objResult);
         assertThat(objData.containsKey("names")).isTrue();
         assertThat(objData.get("names")).isInstanceOf(ArrayList.class);
         assertThat(((ArrayList<HashMap<String,Object>>)objData.get("names")).size()).isEqualTo(2);

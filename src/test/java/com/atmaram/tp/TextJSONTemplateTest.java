@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class TextTemplateTest {
+public class TextJSONTemplateTest {
     @Test
     public void should_parse_text_template_without_variable() throws TemplateParseException {
         TextTemplate textTemplate=TextTemplate.parse("Hello");

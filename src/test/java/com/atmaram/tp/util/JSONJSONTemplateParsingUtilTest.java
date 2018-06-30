@@ -3,7 +3,7 @@ package com.atmaram.tp.util;
 import com.atmaram.tp.exceptions.TemplateParseException;
 import org.junit.Test;
 import static org.assertj.core.api.Assertions.*;
-public class JSONTemplateParsingUtilTest {
+public class JSONJSONTemplateParsingUtilTest {
     @Test
     public void should_replace_loop_variables() throws TemplateParseException {
         String results=JSONTemplateParsingUtil.replaceLoopsWithTransformedJSON("{\"name\":[{{#items}}{\"name\":\"Atmaram\",\"place\":\"India\"}{{/items}}]}");
