@@ -1,4 +1,4 @@
-package com.atmaram.tp.exceptions;
+package com.atmaram.tp.common.exceptions;
 
 public class ValueNotFoundException extends Exception {
     public ValueNotFoundException(String message) {

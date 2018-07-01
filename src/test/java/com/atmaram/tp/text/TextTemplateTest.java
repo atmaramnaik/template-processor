@@ -1,9 +1,6 @@
 package com.atmaram.tp.text;
 
-import com.atmaram.tp.exceptions.TemplateParseException;
-import com.atmaram.tp.text.TextLoop;
-import com.atmaram.tp.text.TextTemplate;
-import com.atmaram.tp.text.TextVariable;
+import com.atmaram.tp.common.exceptions.TemplateParseException;
 import org.junit.Test;
 
 import java.util.ArrayList;

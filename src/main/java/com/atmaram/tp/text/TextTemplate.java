@@ -2,11 +2,10 @@ package com.atmaram.tp.text;
 
 import com.atmaram.tp.Variable;
 import com.atmaram.tp.common.VariableValueProcessor;
-import com.atmaram.tp.exceptions.TemplateParseException;
-import com.atmaram.tp.exceptions.ValueNotFoundException;
+import com.atmaram.tp.common.exceptions.TemplateParseException;
+import com.atmaram.tp.common.exceptions.ValueNotFoundException;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 

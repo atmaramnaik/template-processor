@@ -1,6 +1,6 @@
 package com.atmaram.tp.util;
 
-import com.atmaram.tp.exceptions.TemplateParseException;
+import com.atmaram.tp.common.exceptions.TemplateParseException;
 import org.junit.Test;
 import static org.assertj.core.api.Assertions.*;
 public class JSONTemplateParsingUtilTest {

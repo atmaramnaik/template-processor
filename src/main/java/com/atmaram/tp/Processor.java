@@ -1,7 +1,7 @@
 package com.atmaram.tp;
 
-import com.atmaram.tp.exceptions.TemplateParseException;
-import com.atmaram.tp.exceptions.ValueNotFoundException;
+import com.atmaram.tp.common.exceptions.TemplateParseException;
+import com.atmaram.tp.common.exceptions.ValueNotFoundException;
 import com.atmaram.tp.json.JSONTemplate;
 
 import java.util.HashMap;

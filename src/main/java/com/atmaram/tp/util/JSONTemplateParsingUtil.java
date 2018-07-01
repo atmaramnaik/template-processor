@@ -1,6 +1,6 @@
 package com.atmaram.tp.util;
 
-import com.atmaram.tp.exceptions.TemplateParseException;
+import com.atmaram.tp.common.exceptions.TemplateParseException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;

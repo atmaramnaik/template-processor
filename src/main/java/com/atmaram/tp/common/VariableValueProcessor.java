@@ -1,6 +1,6 @@
 package com.atmaram.tp.common;
 
-import com.atmaram.tp.exceptions.ValueNotFoundException;
+import com.atmaram.tp.common.exceptions.ValueNotFoundException;
 
 import java.util.Date;
 import java.util.HashMap;
