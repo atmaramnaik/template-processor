@@ -1,0 +1,31 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+
+repositories {
+    mavenCentral()
+}
+
+jar {
+    baseName = 'template-processor'
+    version =  '0.0.1'
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+	compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+	compileOnly('org.projectlombok:lombok:1.16.20')
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.9.0'
+}
+
+test {
+	dependsOn 'cleanTest'
+	useJUnit {
+		include 'com/atmaram/tp/'
+	}
+	beforeTest { descriptor ->
+		logger.lifecycle("Running test: " + descriptor)
+	}
+}

@@ -1,6 +1,6 @@
 .gradle/
 .idea/
-build.gradle
 out/
 template-processor.iml
 build/
+.DS_Store

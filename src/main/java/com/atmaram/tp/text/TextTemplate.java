@@ -1,5 +1,6 @@
 package com.atmaram.tp.text;
 
+import com.atmaram.tp.Variable;
 import com.atmaram.tp.exceptions.TemplateParseException;
 
 import java.util.ArrayList;
@@ -122,5 +123,46 @@ public class TextTemplate {
             }
         }
         return result;
+    }
+    public List<Variable> getVariables(){
+        List<Variable> returnValue=new ArrayList<>();
+        for (Object oValue:
+                blocks) {
+
+            if(oValue instanceof String){
+
+            } else if(oValue instanceof TextLoop){
+                TextLoop tlValue=(TextLoop)oValue;
+                Variable variable=new Variable();
+                variable.setName(tlValue.variable);
+                variable.setType("List");
+                TextTemplate inner_tt=tlValue.inner_template;
+                List<Variable> inner_variables=inner_tt.getVariables();
+                List<Variable> inner_variables_excluding_this=new ArrayList<>();
+                boolean found_this_variable=false;
+                for (Variable inner_variable:inner_variables
+                        ) {
+                    if(inner_variable.getName().equals("_this")){
+                        found_this_variable=true;
+                    } else {
+                        inner_variables_excluding_this.add(inner_variable);
+                    }
+                }
+                if(found_this_variable){
+                    returnValue.add(variable);
+                    returnValue.addAll(inner_variables_excluding_this);
+                } else {
+                    variable.setInner_variables(inner_variables_excluding_this);
+                    returnValue.add(variable);
+                }
+
+            } else if(oValue instanceof TextVariable){
+                Variable variable=new Variable();
+                variable.setName(((TextVariable)oValue).name);
+                variable.setType("String");
+                returnValue.add(variable);
+            }
+        }
+        return returnValue;
     }
 }

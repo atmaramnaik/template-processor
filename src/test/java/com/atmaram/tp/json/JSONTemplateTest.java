@@ -1,5 +1,6 @@
 package com.atmaram.tp.json;
 
+import com.atmaram.tp.Variable;
 import com.atmaram.tp.exceptions.TemplateParseException;
 import com.atmaram.tp.json.JSONTemplate;
 import org.json.simple.JSONObject;
@@ -229,5 +230,50 @@ public class JSONTemplateTest {
             assertThat(listElement.get("name")).isIn("Atmaram","Roopa");
             assertThat(listElement.get("place")).isIn("Pune","Mumbai");
         }
+    }
+
+    //getVariables Tests
+    @Test
+    public void should_get_single_variable() throws TemplateParseException {
+        JSONTemplate jsonTemplate =JSONTemplate.parse("{\"name\":${name}}");
+        List<Variable> variables=jsonTemplate.getVariables();
+        assertThat(variables.size()).isEqualTo(1);
+        assertThat(variables.get(0).getType()).isEqualTo("String");
+        assertThat(variables.get(0).getName()).isEqualTo("name");
+
+    }
+    @Test
+    public void should_get_single_variable_in_loop() throws TemplateParseException {
+        JSONTemplate jsonTemplate =JSONTemplate.parse("{\"names\":[{{#names}}{\"name\":${name}}{{/names}}]}");
+        List<Variable> variables=jsonTemplate.getVariables();
+        assertThat(variables.size()).isEqualTo(1);
+        assertThat(variables.get(0).getType()).isEqualTo("List");
+        assertThat(variables.get(0).getName()).isEqualTo("names");
+        assertThat(variables.get(0).getInner_variables().size()).isEqualTo(1);
+        assertThat(variables.get(0).getInner_variables().get(0).getType()).isEqualTo("String");
+        assertThat(variables.get(0).getInner_variables().get(0).getName()).isEqualTo("name");
+
+    }
+    @Test
+    public void should_get_this_variable_in_loop() throws TemplateParseException {
+        JSONTemplate jsonTemplate =JSONTemplate.parse("{\"names\":[{{#names}}{\"name\":${_this}}{{/names}}]}");
+        List<Variable> variables=jsonTemplate.getVariables();
+        assertThat(variables.size()).isEqualTo(1);
+        assertThat(variables.get(0).getType()).isEqualTo("List");
+        assertThat(variables.get(0).getName()).isEqualTo("names");
+        assertThat(variables.get(0).getInner_variables()).isNull();
+
+    }
+    @Test
+    public void should_get_this_variable_in_loop_coming_with_other_variables() throws TemplateParseException {
+        JSONTemplate jsonTemplate =JSONTemplate.parse("{\"names\":[{{#names}}{\"name\":${_this},\"place\":${place}}{{/names}}]}");
+        List<Variable> variables=jsonTemplate.getVariables();
+        assertThat(variables.size()).isEqualTo(2);
+        assertThat(variables.get(0).getType()).isEqualTo("List");
+        assertThat(variables.get(0).getName()).isEqualTo("names");
+        assertThat(variables.get(0).getInner_variables()).isNull();
+        assertThat(variables.get(1).getType()).isEqualTo("String");
+        assertThat(variables.get(1).getName()).isEqualTo("place");
+
     }
 }
