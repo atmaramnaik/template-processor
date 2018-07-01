@@ -2,6 +2,7 @@ package com.atmaram.tp.json;
 
 import com.atmaram.tp.Variable;
 import com.atmaram.tp.exceptions.TemplateParseException;
+import com.atmaram.tp.exceptions.ValueNotFoundException;
 import com.atmaram.tp.json.JSONTemplate;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -15,12 +16,12 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 public class JSONTemplateTest {
     @Test
-    public void should_construct_and_fill_template_when_null_object() throws TemplateParseException {
+    public void should_construct_and_fill_template_when_null_object() throws TemplateParseException, ValueNotFoundException {
         JSONObject obj=(JSONObject) JSONTemplate.parse("{\"name\":[[\"Atmaram\"]]}").fill(null);
         assertThat(obj.toJSONString()).isEqualTo("{\"name\":[[\"Atmaram\"]]}");
     }
     @Test
-    public void should_fill_template_when_nested_this() throws TemplateParseException {
+    public void should_fill_template_when_nested_this() throws TemplateParseException, ValueNotFoundException {
         HashMap<String,Object> obj=new HashMap<>();
         List<List<List<String>>> names=new ArrayList<>();
         List<String> lst1=new ArrayList<>();
@@ -35,7 +36,7 @@ public class JSONTemplateTest {
         assertThat(objJSON.toJSONString()).isEqualTo("{\"name\":[{\"places\":[{\"place\":[{\"value\":\"Atmaram\"},{\"value\":\"Roopa\"}]}]}]}");
     }
     @Test
-    public void should_give_same_template_when_no_variables_without_arrays() throws TemplateParseException {
+    public void should_give_same_template_when_no_variables_without_arrays() throws TemplateParseException, ValueNotFoundException {
         HashMap<String,Object> objData=new HashMap<>();
         List<List<String>> lst=new ArrayList<>();
         List<String> lst1=new ArrayList<>();
@@ -54,7 +55,7 @@ public class JSONTemplateTest {
 
     }
     @Test
-    public void should_give_same_template_when_no_variables_with_arrays() throws TemplateParseException {
+    public void should_give_same_template_when_no_variables_with_arrays() throws TemplateParseException, ValueNotFoundException {
         HashMap<String,Object> objData=new HashMap<>();
         List<List<String>> lst=new ArrayList<>();
         List<String> lst1=new ArrayList<>();
@@ -73,7 +74,7 @@ public class JSONTemplateTest {
 
     }
     @Test
-    public void should_give_same_template_when_no_variables_with_array_containing_static_json_object() throws TemplateParseException {
+    public void should_give_same_template_when_no_variables_with_array_containing_static_json_object() throws TemplateParseException, ValueNotFoundException {
         HashMap<String,Object> objData=new HashMap<>();
         List<List<String>> lst=new ArrayList<>();
         List<String> lst1=new ArrayList<>();
@@ -92,7 +93,7 @@ public class JSONTemplateTest {
 
     }
     @Test
-    public void should_fill_single_value() throws TemplateParseException {
+    public void should_fill_single_value() throws TemplateParseException, ValueNotFoundException {
         JSONTemplate jsonTemplate =JSONTemplate.parse("{\"name\":${name}}");
         HashMap<String,Object> objData=new HashMap<>();
         objData.put("name","Atmaram");
@@ -101,7 +102,7 @@ public class JSONTemplateTest {
     }
 
     @Test
-    public void should_fill_multiple_value() throws TemplateParseException {
+    public void should_fill_multiple_value() throws TemplateParseException, ValueNotFoundException {
         HashMap<String,Object> objData=new HashMap<>();
         objData.put("name","Atmaram");
         objData.put("place","Pune");
@@ -110,7 +111,7 @@ public class JSONTemplateTest {
     }
 
     @Test
-    public void should_fill_array() throws ParseException, TemplateParseException {
+    public void should_fill_array() throws ParseException, TemplateParseException, ValueNotFoundException {
         HashMap<String,Object> objData=new HashMap<>();
         List<String> lst=new ArrayList<>();
         lst.add("Atmaram");
@@ -120,7 +121,7 @@ public class JSONTemplateTest {
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[\"Atmaram\",\"Roopa\"]}");
     }
     @Test
-    public void should_fill_objects_with_array_elements() throws TemplateParseException {
+    public void should_fill_objects_with_array_elements() throws TemplateParseException , ValueNotFoundException{
         HashMap<String,Object> objData=new HashMap<>();
         List<String> lst=new ArrayList<>();
         lst.add("Atmaram");
@@ -130,7 +131,7 @@ public class JSONTemplateTest {
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[{\"name\":\"Atmaram\"},{\"name\":\"Roopa\"}]}");
     }
     @Test
-    public void should_fill_nested_array_constructing_array_with_array() throws TemplateParseException {
+    public void should_fill_nested_array_constructing_array_with_array() throws TemplateParseException, ValueNotFoundException {
         HashMap<String,Object> objData=new HashMap<>();
         List<List<String>> lst=new ArrayList<>();
         List<String> lst1=new ArrayList<>();
@@ -147,14 +148,14 @@ public class JSONTemplateTest {
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[[\"Atmaram\",\"Roopa\"],[\"Hemlata\",\"Rohan\"]]}");
     }
     @Test
-    public void should_return_same_template_if_no_variables() throws TemplateParseException {
+    public void should_return_same_template_if_no_variables() throws TemplateParseException, ValueNotFoundException {
         HashMap<String,Object> objData=new HashMap<>();
         objData.put("name","Mayur");
         JSONObject op=JSONTemplate.parse("{\"name\":[\"Atmaram\"]}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[\"Atmaram\"]}");
     }
     @Test
-    public void should_fill_nested_array_constructing_array_with_object_array() throws TemplateParseException {
+    public void should_fill_nested_array_constructing_array_with_object_array() throws TemplateParseException, ValueNotFoundException {
         HashMap<String,Object> objData=new HashMap<>();
         List<List<String>> lst=new ArrayList<>();
         List<String> lst1=new ArrayList<>();
@@ -171,7 +172,7 @@ public class JSONTemplateTest {
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[{\"inner_array\":[\"Atmaram\",\"Roopa\"]},{\"inner_array\":[\"Hemlata\",\"Rohan\"]}]}");
     }
     @Test
-    public void should_fill_array_with_objects() throws TemplateParseException {
+    public void should_fill_array_with_objects() throws TemplateParseException, ValueNotFoundException {
         HashMap<String,Object> objData=new JSONObject();
         List<HashMap<String,Object>> objArray=new ArrayList<>();
         HashMap<String,Object> obj1=new HashMap<>();

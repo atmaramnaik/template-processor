@@ -1,9 +1,10 @@
 package com.atmaram.tp.json;
 
 import com.atmaram.tp.Variable;
+import com.atmaram.tp.common.VariableValueProcessor;
 import com.atmaram.tp.exceptions.TemplateParseException;
+import com.atmaram.tp.exceptions.ValueNotFoundException;
 import com.atmaram.tp.util.JSONTemplateParsingUtil;
-import com.sun.org.apache.xalan.internal.xsltc.compiler.Template;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -35,7 +36,7 @@ public class JSONTemplate {
             throw new TemplateParseException();
         }
     }
-    public JSONObject fill(HashMap<String,Object> data){
+    public JSONObject fill(HashMap<String,Object> data) throws ValueNotFoundException {
         JSONObject ojoObject=new JSONObject();
         JSONObject joObject=this.jsonTemplate;
 
@@ -45,13 +46,13 @@ public class JSONTemplate {
             if(value instanceof String){
                 if(((String)value).startsWith("${") && ((String)value).endsWith("}")){
                     String variableName=((String)value).substring(2,((String)value).length()-1);
-                        ojoObject.put(key, getVariableValue(variableName,data));
+                        ojoObject.put(key, VariableValueProcessor.getValue(variableName,data));
                 } else {
                     ojoObject.put(key,value);
                 }
             } else if(value instanceof JSONLoop){
                 String loopVariable=( (JSONLoop)value).variable;
-                List<Object> dataArray=(List<Object>)getVariableValue(loopVariable,data);
+                List<Object> dataArray=(List<Object>)VariableValueProcessor.getValue(loopVariable,data);
                 JSONArray outputArray=new JSONArray();
                 JSONTemplate JSONTemplate =new JSONTemplate(((JSONLoop)value).inner_object);
                 for(int i=0;i<dataArray.size();i++){
@@ -84,7 +85,7 @@ public class JSONTemplate {
                     } else if(arrayObject instanceof String){
                         if(((String)arrayObject).startsWith("${") && ((String)arrayObject).endsWith("}")){
                             String variableName=((String)arrayObject).substring(2,((String)arrayObject).length()-1);
-                            filled_array.add(getVariableValue(variableName,data));
+                            filled_array.add(VariableValueProcessor.getValue(variableName,data));
 //                        }
                         } else {
                             filled_array.add(arrayObject);
@@ -101,19 +102,6 @@ public class JSONTemplate {
         }
 
         return ojoObject;
-    }
-    public Object getVariableValue(String variableName,HashMap<String,Object> data){
-        if(variableName.startsWith("_")){
-            if(variableName.equals("_ones()")){
-                List<Integer> lst=new ArrayList<>();
-                lst.add(new Integer(0));
-                return lst;
-            } else if(variableName.equals("_this")){
-                return data.get("_this");
-            }
-            return null;
-        }
-        return data.get(variableName);
     }
     public static JSONObject transform(JSONObject object) {
         JSONObject ojoObject = new JSONObject();

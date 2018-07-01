@@ -1,9 +1,12 @@
 package com.atmaram.tp.text;
 
 import com.atmaram.tp.Variable;
+import com.atmaram.tp.common.VariableValueProcessor;
 import com.atmaram.tp.exceptions.TemplateParseException;
+import com.atmaram.tp.exceptions.ValueNotFoundException;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -93,12 +96,13 @@ public class TextTemplate {
                 result+=(String)oBlock;
             } else if(oBlock instanceof TextVariable){
                 TextVariable textVariable=(TextVariable)oBlock;
-                if(data.containsKey(textVariable.name)){
-                    result+=data.get(textVariable.name);
-                } else {
+                Object value;
+                try{
+                    value=VariableValueProcessor.getValue(textVariable.name,data);
+                    result+=value;
+                } catch (ValueNotFoundException ex){
                     result+="${"+textVariable.name+"}";
                 }
-
             } else if(oBlock instanceof  TextLoop){
                 TextLoop textLoop=(TextLoop)oBlock;
                 List<Object> dataList=(List<Object>)data.get(textLoop.variable);
