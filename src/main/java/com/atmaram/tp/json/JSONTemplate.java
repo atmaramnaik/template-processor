@@ -4,6 +4,7 @@ import com.atmaram.tp.Variable;
 import com.atmaram.tp.common.VariableValueProcessor;
 import com.atmaram.tp.exceptions.TemplateParseException;
 import com.atmaram.tp.exceptions.ValueNotFoundException;
+import com.atmaram.tp.text.TextVariable;
 import com.atmaram.tp.util.JSONTemplateParsingUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -185,10 +186,14 @@ public class JSONTemplate {
             if(oValue instanceof String){
                 if(isVariable((String)oValue)){
                     String variableName=getVariableName((String)oValue);
-                    Variable variable=new Variable();
-                    variable.setName(variableName);
-                    variable.setType("String");
-                    returnValue.add(variable);
+                    if(variableName.startsWith("_") && !variableName.equals("_this")){
+                        //do nothing;
+                    } else{
+                        Variable variable=new Variable();
+                        variable.setName(variableName);
+                        variable.setType("String");
+                        returnValue.add(variable);
+                    }
                 }
             } else if(oValue instanceof JSONLoop){
                 JSONLoop jlValue=(JSONLoop)oValue;

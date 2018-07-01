@@ -161,10 +161,15 @@ public class TextTemplate {
                 }
 
             } else if(oValue instanceof TextVariable){
-                Variable variable=new Variable();
-                variable.setName(((TextVariable)oValue).name);
-                variable.setType("String");
-                returnValue.add(variable);
+                if(((TextVariable)oValue).name.startsWith("_") && !((TextVariable)oValue).name.equals("_this")){
+                    //do nothing;
+                } else{
+                    Variable variable=new Variable();
+                    variable.setName(((TextVariable)oValue).name);
+                    variable.setType("String");
+                    returnValue.add(variable);
+                }
+
             }
         }
         return returnValue;
