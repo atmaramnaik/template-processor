@@ -3,6 +3,7 @@ package com.atmaram.tp.json;
 import com.atmaram.tp.Variable;
 import com.atmaram.tp.common.exceptions.TemplateParseException;
 import com.atmaram.tp.common.exceptions.ValueNotFoundException;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -15,8 +16,14 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 public class JSONTemplateTest {
     @Test
+    public void should_support_static_array_at_root_level_for_parsing() throws TemplateParseException, ValueNotFoundException {
+        JSONArray obj=(JSONArray)JSONTemplate.parse("[\"Atmaram\"]").fill(null);
+        assertThat(obj.toJSONString()).isEqualTo("[\"Atmaram\"]");
+    }
+    //fill test
+    @Test
     public void should_construct_and_fill_template_when_null_object() throws TemplateParseException, ValueNotFoundException {
-        JSONObject obj=(JSONObject) JSONTemplate.parse("{\"name\":[[\"Atmaram\"]]}").fill(null);
+        JSONObject obj=(JSONObject) (JSONObject)JSONTemplate.parse("{\"name\":[[\"Atmaram\"]]}").fill(null);
         assertThat(obj.toJSONString()).isEqualTo("{\"name\":[[\"Atmaram\"]]}");
     }
     @Test
@@ -31,7 +38,7 @@ public class JSONTemplateTest {
         names.add(lst2);
         obj.put("names",names);
 
-        JSONObject objJSON=JSONTemplate.parse("{\"name\":[{{#names}}{\"places\":[{{#_this}}{\"place\":[{{#_this}}{\"value\":${_this}}{{/_this}}]}{{/_this}}]}{{/names}}]}").fill(obj);
+        JSONObject objJSON=(JSONObject)JSONTemplate.parse("{\"name\":[{{#names}}{\"places\":[{{#_this}}{\"place\":[{{#_this}}{\"value\":${_this}}{{/_this}}]}{{/_this}}]}{{/names}}]}").fill(obj);
         assertThat(objJSON.toJSONString()).isEqualTo("{\"name\":[{\"places\":[{\"place\":[{\"value\":\"Atmaram\"},{\"value\":\"Roopa\"}]}]}]}");
     }
     @Test
@@ -49,7 +56,7 @@ public class JSONTemplateTest {
         lst.add(lst2);
         objData.put("names",lst);
         JSONTemplate jsonTemplate =JSONTemplate.parse("{\"name\":\"Atmaram\"}");
-        JSONObject result= jsonTemplate.fill(objData);
+        JSONObject result= (JSONObject) jsonTemplate.fill(objData);
         assertThat(result.toJSONString()).isEqualTo("{\"name\":\"Atmaram\"}");
 
     }
@@ -68,7 +75,7 @@ public class JSONTemplateTest {
         lst.add(lst2);
         objData.put("names",lst);
         JSONTemplate jsonTemplate =JSONTemplate.parse("{\"inner_array\":[\"Hemlata\",\"Rohan\"]}");
-        JSONObject result= jsonTemplate.fill(objData);
+        JSONObject result= (JSONObject)jsonTemplate.fill(objData);
         assertThat(result.toJSONString()).isEqualTo("{\"inner_array\":[\"Hemlata\",\"Rohan\"]}");
 
     }
@@ -96,7 +103,7 @@ public class JSONTemplateTest {
         JSONTemplate jsonTemplate =JSONTemplate.parse("{\"name\":${name}}");
         HashMap<String,Object> objData=new HashMap<>();
         objData.put("name","Atmaram");
-        JSONObject op= jsonTemplate.fill(objData);
+        JSONObject op= (JSONObject)jsonTemplate.fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":\"Atmaram\"}");
     }
 
@@ -105,7 +112,7 @@ public class JSONTemplateTest {
         HashMap<String,Object> objData=new HashMap<>();
         objData.put("name","Atmaram");
         objData.put("place","Pune");
-        JSONObject op=JSONTemplate.parse("{\"name\":${name},\"place\":${place}}").fill(objData);
+        JSONObject op=(JSONObject)JSONTemplate.parse("{\"name\":${name},\"place\":${place}}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":\"Atmaram\",\"place\":\"Pune\"}");
     }
 
@@ -116,7 +123,7 @@ public class JSONTemplateTest {
         lst.add("Atmaram");
         lst.add("Roopa");
         objData.put("names",lst);
-        JSONObject op=JSONTemplate.parse("{\"name\":${names}}").fill(objData);
+        JSONObject op=(JSONObject)JSONTemplate.parse("{\"name\":${names}}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[\"Atmaram\",\"Roopa\"]}");
     }
     @Test
@@ -126,7 +133,7 @@ public class JSONTemplateTest {
         lst.add("Atmaram");
         lst.add("Roopa");
         objData.put("names",lst);
-        JSONObject op=JSONTemplate.parse("{\"name\":[{{#names}}{\"name\":${_this}}{{/names}}]}").fill(objData);
+        JSONObject op=(JSONObject)JSONTemplate.parse("{\"name\":[{{#names}}{\"name\":${_this}}{{/names}}]}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[{\"name\":\"Atmaram\"},{\"name\":\"Roopa\"}]}");
     }
     @Test
@@ -143,14 +150,14 @@ public class JSONTemplateTest {
         lst.add(lst1);
         lst.add(lst2);
         objData.put("names",lst);
-        JSONObject op=JSONTemplate.parse("{\"name\":${names}}").fill(objData);
+        JSONObject op=(JSONObject)JSONTemplate.parse("{\"name\":${names}}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[[\"Atmaram\",\"Roopa\"],[\"Hemlata\",\"Rohan\"]]}");
     }
     @Test
     public void should_return_same_template_if_no_variables() throws TemplateParseException, ValueNotFoundException {
         HashMap<String,Object> objData=new HashMap<>();
         objData.put("name","Mayur");
-        JSONObject op=JSONTemplate.parse("{\"name\":[\"Atmaram\"]}").fill(objData);
+        JSONObject op=(JSONObject)JSONTemplate.parse("{\"name\":[\"Atmaram\"]}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[\"Atmaram\"]}");
     }
     @Test
@@ -167,7 +174,7 @@ public class JSONTemplateTest {
         lst.add(lst1);
         lst.add(lst2);
         objData.put("names",lst);
-        JSONObject op=JSONTemplate.parse("{\"name\":[{{#names}}{\"inner_array\":${_this}}{{/names}}]}").fill(objData);
+        JSONObject op=(JSONObject)JSONTemplate.parse("{\"name\":[{{#names}}{\"inner_array\":${_this}}{{/names}}]}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[{\"inner_array\":[\"Atmaram\",\"Roopa\"]},{\"inner_array\":[\"Hemlata\",\"Rohan\"]}]}");
     }
     @Test
@@ -183,7 +190,7 @@ public class JSONTemplateTest {
         objArray.add(obj1);
         objArray.add(obj2);
         objData.put("items",objArray);
-        JSONObject op=JSONTemplate.parse("{\"name\":[{{#items}}{\"name\":${name},\"place\":${place}}{{/items}}]}").fill(objData);
+        JSONObject op=(JSONObject)JSONTemplate.parse("{\"name\":[{{#items}}{\"name\":${name},\"place\":${place}}{{/items}}]}").fill(objData);
         assertThat(op.toJSONString()).isEqualTo("{\"name\":[{\"name\":\"Atmaram\",\"place\":\"Mumbai\"},{\"name\":\"Roopa\",\"place\":\"Pune\"}]}");
     }
 
