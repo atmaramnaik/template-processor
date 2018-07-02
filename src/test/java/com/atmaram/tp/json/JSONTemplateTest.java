@@ -195,6 +195,41 @@ public class JSONTemplateTest {
     }
 
     //Extract Tests
+    @Test
+    public void should_extract_single_variable_from_static_array() throws TemplateParseException, ParseException {
+        JSONParser parser=new JSONParser();
+        JSONTemplate jsonTemplate =JSONTemplate.parse("[{ \"developer\":${Developer}}]");
+        JSONArray objResult=(JSONArray) parser.parse("[{ \"developer\":\"Atmaram\"}]");
+        HashMap<String,Object> objData= jsonTemplate.extract(objResult);
+        assertThat(objData.containsKey("Developer")).isTrue();
+        assertThat(objData.get("Developer")).isEqualTo("Atmaram");
+
+    }
+
+    @Test
+    public void should_extract_single_variable_from_nested_objects() throws TemplateParseException, ParseException {
+        JSONParser parser=new JSONParser();
+        JSONTemplate jsonTemplate =JSONTemplate.parse("[\n" +
+                "  {\n" +
+                "    \"Number\": \"213231231231231\",\n" +
+                "    \"Id\": {\n" +
+                "      \"Id\": ${Id}\n" +
+                "    }\n" +
+                "  }\n" +
+                "]");
+        JSONArray objResult=(JSONArray) parser.parse("[\n" +
+                "  {\n" +
+                "    \"Number\": \"213231231231231\",\n" +
+                "    \"Id\": {\n" +
+                "      \"Id\": \"My-ID\",\n" +
+                "      \"Number\": \"BTY-X393700\"" +
+                "    }\n" +
+                "  }\n" +
+                "]");
+        HashMap<String,Object> objData= jsonTemplate.extract(objResult);
+        assertThat(objData.containsKey("Id")).isTrue();
+        assertThat(objData.get("Id")).isEqualTo("My-ID");
+    }
 
     @Test
     public void should_extract_single_variable() throws TemplateParseException, ParseException {

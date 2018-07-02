@@ -94,14 +94,13 @@ public class JSONTemplate {
     }
     private HashMap<String,Object> extractJSONArray(JSONArray jsonResult,HashMap<String,Object> retData){
         JSONArray templateArray=(JSONArray) jsonTemplate;
-        List lst=new ArrayList();
         for(int i=0;i<templateArray.size();i++){
             Object oValue=templateArray.get(i);
             if(oValue instanceof JSONAware){
-                JSONAware arrayElementJSONResult=(JSONAware)oValue;
+                JSONAware arrayElementJSONResult=(JSONAware)jsonResult.get(i);
                 JSONTemplate jsonTemplate =new JSONTemplate();
                 jsonTemplate.jsonTemplate=(JSONAware) oValue;
-                lst.add(jsonTemplate.extract(arrayElementJSONResult));
+                retData.putAll(jsonTemplate.extract(arrayElementJSONResult));
             } else if(oValue instanceof String){
                 if(isVariable((String)oValue)){
                     String newVariableName=getVariableName((String)oValue);
@@ -149,9 +148,9 @@ public class JSONTemplate {
                 if(oValue instanceof JSONLoop){
                     retData.putAll(jsonTemplate.extract((JSONAware)jsonResult.get(key)));
                 } else if(oValue instanceof JSONObject){
-                    retData.put((String)key,jsonTemplate.extract((JSONObject)jsonResult.get(key)));
+                    retData.putAll(jsonTemplate.extract((JSONObject)jsonResult.get(key)));
                 } else if(oValue instanceof JSONArray){
-                    retData.put((String)key,jsonTemplate.extract((JSONArray)jsonResult.get(key)));
+                    retData.putAll(jsonTemplate.extract((JSONArray)jsonResult.get(key)));
                 }
             }
         }
